@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تقرير التخطيط المالي للزفاف</title>
+
+<style>
+:root{
+  --primary:#4f6ef7;
+  --border:#e5e7eb;
+  --muted:#64748b;
+  --text:#0f172a;
+  --soft:#f8fafc;
+}
+
+body{
+  font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+  background:#fff;
+  color:var(--text);
+  margin:40px;
+  direction: rtl;
+}
+
+/* ================= HEADER ================= */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-bottom:8px;
+}
+
+.header img{
+  width:34px;
+  height:34px;
+  filter: brightness(0) saturate(100%);
+}
+
+.header h1{
+  font-size:26px;
+  margin:0;
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:42px;
+  font-size:14px;
+}
+
+/* ================= SECTIONS ================= */
+.section{
+  margin-bottom:36px;
+}
+
+.section-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:18px;
+  margin-bottom:16px;
+}
+
+.section-title::before{
+  content:"";
+  width:4px;
+  height:18px;
+  background:var(--primary);
+  border-radius:2px;
+}
+
+/* ================= TABLE ================= */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--soft);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+th, td{
+  border:1px solid var(--border);
+  padding:12px 14px;
+  font-size:14px;
+}
+
+th{
+  width:40%;
+  background:#f1f5f9;
+  font-weight:600;
+  color:#334155;
+}
+
+/* ================= SUMMARY CARDS ================= */
+.summary{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.summary-card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px;
+  background:#fff;
+}
+
+.summary-card label{
+  font-size:12px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:4px;
+}
+
+.summary-card span{
+  font-size:20px;
+  font-weight:600;
+  color:var(--primary);
+}
+
+/* ================= FOOTER ================= */
+.footer{
+  margin-top:50px;
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* ================= PRINT ================= */
+@media print {
+
+  .page-break{
+    page-break-before: always;
+    break-before: page;
+  }
+
+  table, tr, td, th{
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <img src="icon.png" alt="Wedding Cost Flow">
+  <h1>تقرير التخطيط المالي للزفاف</h1>
+</div>
+
+<div class="subtitle">
+ملخص ميزانية الزفاف والادخار
+</div>
+
+<!-- COUPLE -->
+<div class="section">
+  <div class="section-title">معلومات الزوجين</div>
+  <table>
+    <tr><th>اسم العروس</th><td id="bride"></td></tr>
+    <tr><th>اسم العريس</th><td id="groom"></td></tr>
+    <tr><th>تاريخ الزفاف</th><td id="date"></td></tr>
+  </table>
+</div>
+
+<!-- SUMMARY -->
+<div class="section">
+  <div class="section-title">الملخص</div>
+  <div class="summary">
+    <div class="summary-card"><label>عدد الضيوف</label><span id="guests"></span></div>
+    <div class="summary-card"><label>عدد الطاولات</label><span id="tables"></span></div>
+    <div class="summary-card"><label>التكلفة الإجمالية</label><span id="totalCost"></span></div>
+    <div class="summary-card"><label>عدد الأشهر المطلوبة</label><span id="months"></span></div>
+  </div>
+</div>
+
+<!-- COSTS -->
+<div class="section">
+  <div class="section-title">تكاليف الزفاف</div>
+  <table>
+    <tr><th>سعر الطاولة</th><td id="priceTable"></td></tr>
+    <tr><th>لباس العروس</th><td id="brideOutfit"></td></tr>
+    <tr><th>مكياج العروس</th><td id="makeup"></td></tr>
+    <tr><th>لباس العريس</th><td id="groomOutfit"></td></tr>
+    <tr><th>المدخرات الحالية</th><td id="existing"></td></tr>
+  </table>
+</div>
+
+<!-- EXTRA COSTS -->
+<div class="section page-break" id="extraSection">
+  <div class="section-title">المصاريف الإضافية</div>
+  <table id="extraTable">
+    <tr><th>الوصف</th><th>المبلغ</th></tr>
+  </table>
+</div>
+
+<!-- SAVINGS -->
+<div class="section page-break">
+  <div class="section-title">الادخار الشهري</div>
+  <table>
+    <tr><th>راتب العروس</th><td id="salaryF"></td></tr>
+    <tr><th>نسبة ادخار العروس %</th><td id="percentF"></td></tr>
+    <tr><th>راتب العريس</th><td id="salaryH"></td></tr>
+    <tr><th>نسبة ادخار العريس %</th><td id="percentH"></td></tr>
+  </table>
+</div>
+
+<div class="footer">
+تم إنشاء هذا التقرير بواسطة Wedding Cost Flow – © Digital Kits Hub
+</div>
+
+<script>
+const p = new URLSearchParams(location.search);
+
+const fields = [
+  "bride","groom","date","guests","tables","totalCost","months",
+  "priceTable","brideOutfit","makeup","groomOutfit","existing",
+  "salaryF","percentF","salaryH","percentH"
+];
+
+fields.forEach(f=>{
+  const el=document.getElementById(f);
+  if(el) el.innerText=p.get(f)||"-";
+});
+
+const extras = JSON.parse(p.get("extras")||"[]");
+const table = document.getElementById("extraTable");
+
+if(extras.length===0){
+  document.getElementById("extraSection").style.display="none";
+}else{
+  extras.forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${e.title}</td><td>${e.price}</td>`;
+    table.appendChild(tr);
+  });
+}
+</script>
+
+</body>
+</html>

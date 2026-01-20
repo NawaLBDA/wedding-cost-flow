@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wedding Cost Flow</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --bg:#f4f6fb;
+  --sidebar:#0f172a;
+  --sidebar-border:#1e293b;
+  --primary:#4f6ef7;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e5e7eb;
+}
+
+/* DARK MODE */
+body.dark{
+  --bg:#0b1220;
+  --sidebar:#020617;
+  --sidebar-border:#1e293b;
+  --card:#020617;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --border:#1e293b;
+}
+
+/* RTL MODE */
+body.rtl{
+  direction:rtl;
+}
+
+body.rtl .section h2{
+  border-left:none;
+  border-right:4px solid var(--primary);
+  padding-left:0;
+  padding-right:12px;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter, Segoe UI, Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  width:260px;
+  background:var(--sidebar);
+  border-right:1px solid var(--sidebar-border);
+  padding:28px 22px;
+}
+.logo{
+  text-align:center;
+  font-size:18px;
+  font-weight:700;
+  color:white;
+  margin-bottom:26px;
+}
+.sidebar-divider{
+  height:1px;
+  background:var(--sidebar-border);
+  margin-bottom:24px;
+}
+.menu a{
+  display:block;
+  padding:12px 16px;
+  margin-bottom:6px;
+  border-radius:10px;
+  color:#cbd5e1;
+  text-decoration:none;
+  font-size:14px;
+  cursor:pointer;
+}
+.menu a.active{
+  background:rgba(79,110,247,.15);
+  color:white;
+  font-weight:600;
+}
+
+/* CONTENT */
+.content{flex:1;padding:36px}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+  margin-bottom:32px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+}
+.card h3{font-size:13px;color:var(--muted)}
+.card .value{font-size:28px;font-weight:700;color:var(--primary)}
+
+/* SECTIONS */
+.section{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:26px;
+  margin-bottom:32px;
+}
+.section h2{
+  font-size:17px;
+  border-left:4px solid var(--primary);
+  padding-left:12px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+label{font-size:12px;color:var(--muted)}
+input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+}
+input:disabled{opacity:.7}
+
+/* EXTRA COSTS */
+.extra-row{
+  display:grid;
+  grid-template-columns:2fr 1fr auto;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+/* BUTTON */
+button{
+  padding:12px 22px;
+  border-radius:12px;
+  border:none;
+  background:var(--primary);
+  color:white;
+  font-weight:600;
+  cursor:pointer;
+}
+button.secondary{background:#64748b}
+
+/* FOOTER */
+.footer{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  margin-top:30px;
+}
+.lang-dropdown{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.lang-dropdown select{
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+}
+/* TRANSLATE ICON – auto light / dark */
+.translate-icon svg{
+  width:20px;
+  height:20px;
+  color:var(--text); /* 🔥 clé magique */
+}
+.translate-icon svg{
+  transition:color .2s ease, transform .2s ease;
+}
+
+.lang-dropdown:hover .translate-icon svg{
+  color:var(--primary);
+  transform:scale(1.05);
+}
+/* CALENDAR ICON – auto light / dark */
+input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: invert(0);
+  cursor:pointer;
+}
+
+/* Dark mode → icon white */
+body.dark input[type="date"]::-webkit-calendar-picker-indicator{
+  filter: invert(1);
+}
+/* EXPORT LOADING */
+button.loading{
+  pointer-events:none;
+  opacity:.8;
+  position:relative;
+}
+
+button.loading::after{
+  content:"";
+  display:inline-block;
+  width:1.2em;
+  text-align:left;
+  animation:dots 1.5s infinite;
+}
+
+@keyframes dots{
+  0%   {content:"";}
+  33%  {content:".";}
+  66%  {content:"..";}
+  100% {content:"...";}
+}
+/* PRINT BUTTON CENTER */
+.print-wrapper{
+  display:flex;
+  justify-content:center;
+  margin:50px 0 20px;
+}
+
+#printBtn,
+#print-wrapper button{
+  min-width:200px;
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">Wedding Cost Flow</div>
+  <div class="sidebar-divider"></div>
+  <div class="menu">
+    <a class="active" onclick="navigate(this,'couple')" data-i18n="menuCouple">Couple</a>
+    <a onclick="navigate(this,'dashboard')" data-i18n="menuOverview">Overview</a>
+    <a onclick="navigate(this,'guests')" data-i18n="menuGuests">Guests</a>
+    <a onclick="navigate(this,'costs')" data-i18n="menuCosts">Costs</a>
+    <a onclick="navigate(this,'savings')" data-i18n="menuSavings">Savings</a>
+  </div>
+</div>
+
+<div class="content">
+
+<div class="header">
+  <h1 data-i18n="title">Wedding Financial Planning Report</h1>
+  <div style="display:flex;gap:10px">
+    <button class="secondary" onclick="toggleTheme()" data-i18n="theme">Change theme</button>
+<div class="lang-dropdown">
+  <span class="translate-icon">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="1.8"
+         stroke-linecap="round"
+         stroke-linejoin="round">
+      <path d="M4 5h8"/>
+      <path d="M8 5v2"/>
+      <path d="M4 9h8"/>
+      <path d="M6 9a6 6 0 006 6"/>
+      <path d="M10 9a6 6 0 01-6 6"/>
+      <path d="M14 5h6"/>
+      <path d="M17 5v14"/>
+      <path d="M14 19h6"/>
+    </svg>
+  </span>
+
+  <select id="langSelect">
+    <option value="en">English</option>
+    <option value="ar">العربية</option>
+  </select>
+</div>
+
+
+  </div>
+</div>
+
+<!-- COUPLE -->
+<div class="section" id="couple">
+<h2 data-i18n="coupleInfo">Couple Information</h2>
+<div class="grid">
+  <div><label data-i18n="brideName">Bride full name</label><input id="brideName"></div>
+  <div><label data-i18n="groomName">Groom full name</label><input id="groomName"></div>
+  <div><label data-i18n="weddingDate">Estimated wedding date</label><input type="date" id="weddingDate"></div>
+</div>
+</div>
+
+<!-- SUMMARY -->
+<div class="cards" id="dashboard">
+  <div class="card"><h3 data-i18n="totalGuests">Total Guests</h3><div class="value" id="totalGuests">0</div></div>
+  <div class="card"><h3 data-i18n="tablesNeeded">Tables Needed</h3><div class="value" id="tablesCard">0</div></div>
+  <div class="card"><h3 data-i18n="totalCost">Total Wedding Cost</h3><div class="value" id="totalCost">$0</div></div>
+  <div class="card"><h3 data-i18n="monthsNeeded">Months Needed</h3><div class="value" id="monthsNeeded">0</div></div>
+</div>
+
+<!-- GUESTS -->
+<div class="section" id="guests">
+<h2 data-i18n="guestsTitle">Guests & Tables</h2>
+<div class="grid">
+  <div><label data-i18n="adults">Adults (seated)</label><input id="adults" value="50"></div>
+  <div><label data-i18n="children">Children (seated)</label><input id="children" value="0"></div>
+  <div><label data-i18n="unseated">Unseated guests</label><input id="unseated" value="0"></div>
+  <div><label data-i18n="perTable">People per table</label><input id="perTable" value="10"></div>
+  <div><label data-i18n="tablesAuto">Tables needed (auto)</label><input id="tablesNeeded" disabled></div>
+</div>
+</div>
+
+<!-- COSTS -->
+<div class="section" id="costs">
+<h2 data-i18n="costsTitle">Wedding Costs</h2>
+<div class="grid">
+  <div><label data-i18n="priceTable">Price per table</label><input id="priceTable" value="2000"></div>
+  <div><label data-i18n="brideOutfit">Bride outfit</label><input id="brideOutfit" value="8000"></div>
+  <div><label data-i18n="makeup">Bride makeup</label><input id="makeup" value="3000"></div>
+  <div><label data-i18n="groomOutfit">Groom outfit</label><input id="groomOutfit" value="4000"></div>
+  <div><label data-i18n="existing">Existing savings</label><input id="existing" value="0"></div>
+</div>
+
+<h3 data-i18n="extraCosts" style="margin-top:20px">Additional Costs</h3>
+<div id="extraCosts"></div>
+<button onclick="addExtra()" data-i18n="addCharge">+ Add charge</button>
+</div>
+
+<!-- SAVINGS -->
+<div class="section" id="savings">
+<h2 data-i18n="savingsTitle">Savings</h2>
+<div class="grid">
+  <div><label data-i18n="salaryF">Bride salary</label><input id="salaryF" value="1500"></div>
+  <div><label data-i18n="percentF">Bride saving %</label><input id="percentF" value="20"></div>
+  <div><label data-i18n="salaryH">Groom salary</label><input id="salaryH" value="2000"></div>
+  <div><label data-i18n="percentH">Groom saving %</label><input id="percentH" value="30"></div>
+</div>
+</div>
+
+<div class="print-wrapper">
+  <button id="exportBtn" onclick="exportPDF()" data-i18n="export">
+    Print
+  </button>
+</div>
+
+
+
+<div class="footer">© Digital Kits Hub</div>
+
+</div>
+</div>
+
+<script>
+/* ===== CORE ===== */
+const $=id=>document.getElementById(id);
+let userPickedDate=false;
+let currentLang="en";
+
+function navigate(el,id){
+  document.querySelectorAll(".menu a").forEach(a=>a.classList.remove("active"));
+  el.classList.add("active");
+  $(id).scrollIntoView({behavior:"smooth"});
+}
+
+function toggleTheme(){document.body.classList.toggle("dark");}
+
+$("weddingDate").addEventListener("input",()=>userPickedDate=true);
+
+function addExtra(){
+  const row=document.createElement("div");
+  row.className="extra-row";
+  row.innerHTML=`
+    <input placeholder="${currentLang==='ar'?'وصف التكلفة':'Charge title'}">
+    <input type="number" placeholder="${currentLang==='ar'?'المبلغ':'Price'}">
+    <button onclick="this.parentNode.remove();calc()">✕</button>`;
+  row.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));
+  $("extraCosts").appendChild(row);
+}
+
+function calc(){
+  const adults=+$("adults").value||0;
+  const children=+$("children").value||0;
+  const unseated=+$("unseated").value||0;
+  const perTable=Math.max(1,+$("perTable").value||1);
+
+  const tables=Math.ceil((adults+children)/perTable);
+  let extras=0;
+  document.querySelectorAll("#extraCosts input[type=number]").forEach(i=>extras+=+i.value||0);
+
+  const baseCost=tables*(+$("priceTable").value||0)
+    + (+$("brideOutfit").value||0)
+    + (+$("makeup").value||0)
+    + (+$("groomOutfit").value||0);
+
+  const totalCost=baseCost+extras;
+
+  const brideSave=(+$("salaryF").value||0)*(+$("percentF").value||0)/100;
+  const groomSave=(+$("salaryH").value||0)*(+$("percentH").value||0)/100;
+  const monthly=brideSave+groomSave;
+
+  const remaining=Math.max(0,totalCost-(+$("existing").value||0));
+  const months=monthly>0?Math.ceil(remaining/monthly):0;
+
+  if(!userPickedDate&&months>0){
+    const d=new Date();d.setMonth(d.getMonth()+months);
+    $("weddingDate").value=d.toISOString().split("T")[0];
+  }
+
+  $("totalGuests").innerText=adults+children+unseated;
+  $("tablesNeeded").value=tables;
+  $("tablesCard").innerText=tables;
+  $("totalCost").innerText=totalCost.toLocaleString();
+  $("monthsNeeded").innerText=months;
+}
+
+document.querySelectorAll("input").forEach(i=>i.addEventListener("input",calc));
+calc();
+
+/* ===== I18N ===== */
+const i18n={
+  en:{
+    title:"Wedding Financial Planning Report",
+    theme:"Change theme",
+    menuCouple:"Couple",
+    menuOverview:"Overview",
+    menuGuests:"Guests",
+    menuCosts:"Costs",
+    menuSavings:"Savings",
+    coupleInfo:"Couple Information",
+    guestsTitle:"Guests & Tables",
+    costsTitle:"Wedding Costs",
+    savingsTitle:"Savings",
+    brideName:"Bride full name",
+    groomName:"Groom full name",
+    weddingDate:"Estimated wedding date",
+    totalGuests:"Total Guests",
+    tablesNeeded:"Tables Needed",
+    totalCost:"Total Wedding Cost",
+    monthsNeeded:"Months Needed",
+    adults:"Adults (seated)",
+    children:"Children (seated)",
+    unseated:"Unseated guests",
+    perTable:"People per table",
+    tablesAuto:"Tables needed (auto)",
+    priceTable:"Price per table",
+    brideOutfit:"Bride outfit",
+    makeup:"Bride makeup",
+    groomOutfit:"Groom outfit",
+    existing:"Existing savings",
+    extraCosts:"Additional Costs",
+    addCharge:"+ Add charge",
+    salaryF:"Bride salary",
+    percentF:"Bride saving %",
+    salaryH:"Groom salary",
+    percentH:"Groom saving %",
+    export:"Print PDF"
+  },
+  ar:{
+    title:"تقرير التخطيط المالي للزفاف",
+    theme:"تغيير المود",
+    menuCouple:"الزوجان",
+    menuOverview:"نظرة عامة",
+    menuGuests:"الضيوف",
+    menuCosts:"التكاليف",
+    menuSavings:"الادخار",
+    coupleInfo:"معلومات الزوجين",
+    guestsTitle:"الضيوف والطاولات",
+    costsTitle:"تكاليف الزفاف",
+    savingsTitle:"الادخار",
+    brideName:"اسم العروس",
+    groomName:"اسم العريس",
+    weddingDate:"تاريخ الزفاف",
+    totalGuests:"إجمالي الضيوف",
+    tablesNeeded:"عدد الطاولات",
+    totalCost:"التكلفة الإجمالية",
+    monthsNeeded:"عدد الأشهر المطلوبة",
+    adults:"الكبار (جلوس)",
+    children:"الأطفال (جلوس)",
+    unseated:"ضيوف بدون جلوس",
+    perTable:"عدد الأشخاص لكل طاولة",
+    tablesAuto:"عدد الطاولات (تلقائي)",
+    priceTable:"سعر الطاولة",
+    brideOutfit:"لباس العروس",
+    makeup:"مكياج العروس",
+    groomOutfit:"لباس العريس",
+    existing:"المدخرات الحالية",
+    extraCosts:"تكاليف إضافية",
+    addCharge:"+ إضافة تكلفة",
+    salaryF:"راتب العروس",
+    percentF:"نسبة ادخار العروس",
+    salaryH:"راتب العريس",
+    percentH:"نسبة ادخار العريس",
+    export:"طبع نسخة PDF"
+  }
+};
+
+function setLanguage(lang){
+  currentLang = lang;
+
+  // RTL
+  document.body.classList.toggle("rtl", lang === "ar");
+
+  // Traductions
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if(i18n[lang][key]){
+      el.innerText = i18n[lang][key];
+    }
+  });
+
+  // Update placeholders already added
+  document.querySelectorAll("#extraCosts .extra-row").forEach(row => {
+    row.children[0].placeholder =
+      lang === "ar" ? "وصف التكلفة" : "Charge title";
+    row.children[1].placeholder =
+      lang === "ar" ? "المبلغ" : "Price";
+  });
+}
+
+function exportPDF(){
+  const btn = document.getElementById("exportBtn");
+
+  if(!window.electronAPI){
+    alert("Electron API not available");
+    return;
+  }
+
+  // 🔄 START LOADING
+  btn.classList.add("loading");
+  btn.disabled = true;
+
+  const extras=[];
+  document.querySelectorAll("#extraCosts .extra-row").forEach(r=>{
+    extras.push({
+      title:r.children[0].value,
+      price:r.children[1].value
+    });
+  });
+
+  window.electronAPI.generateReport({
+    lang:currentLang,
+    bride:brideName.value,
+    groom:groomName.value,
+    date:weddingDate.value,
+    guests:totalGuests.innerText,
+    tables:tablesCard.innerText,
+    totalCost:totalCost.innerText,
+    months:monthsNeeded.innerText,
+    priceTable:priceTable.value,
+    brideOutfit:brideOutfit.value,
+    makeup:makeup.value,
+    groomOutfit:groomOutfit.value,
+    existing:existing.value,
+    salaryF:salaryF.value,
+    percentF:percentF.value,
+    salaryH:salaryH.value,
+    percentH:percentH.value,
+    extras:JSON.stringify(extras)
+  });
+
+  // 🕒 STOP LOADING (sécurité si pas de retour Electron)
+  setTimeout(()=>{
+    btn.classList.remove("loading");
+    btn.disabled = false;
+  },3000);
+}
+
+/* ===== INIT LANGUAGE SYSTEM (VERY IMPORTANT ORDER) ===== */
+
+const langSelect = document.getElementById("langSelect");
+
+// Default language
+currentLang = "en";
+langSelect.value = "en";
+setLanguage("en");
+
+// Dropdown change
+langSelect.addEventListener("change", e => {
+  setLanguage(e.target.value);
+});
+
+</script>
+
+</body>
+</html>
