@@ -20,6 +20,7 @@
   "productName": "Wedding Cost Flow",
   "copyright": "© 2026 Digital Kits Hub",
   "asar": true,
+  "publish": null,
   "directories": {
     "output": "dist"
   },
