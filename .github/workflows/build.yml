@@ -13,6 +13,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      ELECTRON_BUILDER_PUBLISH: never
+
     steps:
       - uses: actions/checkout@v4
 
