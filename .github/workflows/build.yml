@@ -2,14 +2,14 @@ name: Build Wedding Cost Flow
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   build:
     strategy:
+      fail-fast: false   # ⭐ TRÈS IMPORTANT
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -32,4 +32,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Wedding-Cost-Flow-${{ matrix.os }}
-          path: dist/**
+          path: dist/
