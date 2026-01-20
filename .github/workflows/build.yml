@@ -7,29 +7,30 @@ on:
 jobs:
   build:
     strategy:
-      fail-fast: false   # ⭐ TRÈS IMPORTANT
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Build application
-        run: npm run build
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
+        run: npm run build:win
 
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+      - name: Build macOS
+        if: matrix.os == 'macos-latest'
+        run: npm run build:mac
+
+      - uses: actions/upload-artifact@v4
         with:
           name: Wedding-Cost-Flow-${{ matrix.os }}
           path: dist/

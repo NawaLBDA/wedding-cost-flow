@@ -4,44 +4,38 @@
   "description": "Wedding Cost Flow – Wedding Financial Planning Tool",
   "main": "main.js",
   "author": "Digital Kits Hub",
-  "scripts": {
+    "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
-  },
+    "build:win": "electron-builder --win --x64",
+    "build:mac": "electron-builder --mac --x64"
+    },
+
   "devDependencies": {
     "electron": "^28.0.0",
     "electron-builder": "^26.4.0",
     "javascript-obfuscator": "^5.1.0"
   },
-    "build": {
-    "appId": "com.digitalkitshub.weddingcostflow",
-    "productName": "Wedding Cost Flow",
-    "copyright": "© 2026 Digital Kits Hub",
-    "directories": {
-        "output": "dist"
-    },
-    "files": [
-        "**/*"
-    ],
+ "build": {
+  "appId": "com.digitalkitshub.weddingcostflow",
+  "productName": "Wedding Cost Flow",
+  "copyright": "© 2026 Digital Kits Hub",
+  "asar": true,
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "**/*"
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "icon.ico"
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "icon.png",
+    "identity": null
+  }
+}
 
-    "win": {
-        "target": "nsis",
-        "icon": "icon.ico"
-    },
-
-    "mac": {
-        "target": "dmg",
-        "icon": "icon.icns",
-        "category": "public.app-category.finance"
-    },
-
-    "linux": {
-        "target": [
-        "AppImage",
-        "deb"
-        ],
-        "icon": "build/icons"
-    }
-    }
 
 }
